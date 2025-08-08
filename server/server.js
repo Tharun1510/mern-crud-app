@@ -6,7 +6,7 @@ connectDB();
 const app = express();
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://my-crud-app.vercel.app' // Add your live frontend URL here
+    'https://mern-crud-app-henna-one.vercel.app' // Add your live frontend URL here
 ];
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
