@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [newTodoTitle, setNewTodoTitle] = useState('');
@@ -13,7 +13,7 @@ const TodoList = () => {
 
   const fetchTodos = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/todos');
+      const response = await axios.get(`${API_URL}/todos`);
       if (response.data && Array.isArray(response.data.todos)) {
         setTodos(response.data.todos);
       } else {
@@ -35,12 +35,12 @@ const TodoList = () => {
     if (!newTodoDueDate) return toast.error("Due date is required.");
 
     try {
-      const response = await axios.post('http://localhost:4000/api/todos', {
+      const response = await axios.post(`${API_URL}/todos`, {
         title: newTodoTitle,
         description: newTodoDescription,
         dueDate: newTodoDueDate,
       });
-      
+
       if (response.data && response.data.todo) {
         setTodos([...todos, response.data.todo].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)));
         toast.success("Task added successfully!");
@@ -56,10 +56,10 @@ const TodoList = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:4000/api/todos/${id}`, {
+      const response = await axios.put(`${API_URL}/todos/${id}`, {
         status: newStatus,
       });
-      setTodos(todos.map(todo => 
+      setTodos(todos.map(todo =>
         todo._id === id ? response.data.todo : todo
       ));
     } catch (error) {
@@ -70,8 +70,8 @@ const TodoList = () => {
 
   const handleDeleteTodo = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/api/todos/${id}`);
-      setTodos(todos.filter(todo => todo._id !== id));
+      await axios.delete(`${API_URL}/todos/${id}`);
+ setTodos(todos.filter(todo => todo._id !== id));
       toast.info("Task deleted.");
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to delete task.";
@@ -93,32 +93,32 @@ const TodoList = () => {
   return (
     <div className="w-full max-w-4xl mx-auto mt-10">
       <h1 className="mb-8 text-4xl font-bold text-center text-white">My Project Planner</h1>
-      
+
       {/* --- UPDATED FORM LAYOUT --- */}
       <form onSubmit={handleCreateTodo} className="grid grid-cols-1 gap-4 p-4 mb-8 bg-gray-800 rounded-lg sm:grid-cols-2">
-        <input 
-          type="text" 
-          value={newTodoTitle} 
-          onChange={(e) => setNewTodoTitle(e.target.value)} 
-          placeholder="New Task Title..." 
+        <input
+          type="text"
+          value={newTodoTitle}
+          onChange={(e) => setNewTodoTitle(e.target.value)}
+          placeholder="New Task Title..."
           className="p-2 text-white bg-gray-700 border border-gray-600 rounded sm:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <textarea 
-          value={newTodoDescription} 
-          onChange={(e) => setNewTodoDescription(e.target.value)} 
-          placeholder="Description..." 
+        <textarea
+          value={newTodoDescription}
+          onChange={(e) => setNewTodoDescription(e.target.value)}
+          placeholder="Description..."
           rows="2"
           className="p-2 text-white bg-gray-700 border border-gray-600 rounded sm:col-span-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <input 
-          type="date" 
-          value={newTodoDueDate} 
-          onChange={(e) => setNewTodoDueDate(e.target.value)} 
-          min={today} 
+        <input
+          type="date"
+          value={newTodoDueDate}
+          onChange={(e) => setNewTodoDueDate(e.target.value)}
+          min={today}
           className="p-2 text-white bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="px-6 py-2 font-semibold text-white transition bg-blue-600 rounded cursor-pointer hover:bg-blue-700"
         >
           Add
@@ -129,8 +129,8 @@ const TodoList = () => {
       <div className="mb-8">
         {/* Dropdown for Mobile */}
         <div className="sm:hidden">
-          <select 
-            value={filter} 
+          <select
+            value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="w-full p-2 text-white bg-gray-700 border border-gray-600 rounded"
           >
@@ -182,7 +182,7 @@ const TaskCard = ({ todo, onStatusChange, onDelete, formatDate }) => {
         <h3 className={`font-bold ${todo.status === 'Completed' ? 'line-through text-gray-400' : ''}`}>{todo.title}</h3>
         {todo.description && <p className={`text-sm text-gray-400 mt-1 ${todo.status === 'Completed' ? 'line-through' : ''}`}>{todo.description}</p>}
       </div>
-      
+
       <div className="flex items-center self-end gap-4 sm:self-center">
         <span className="text-xs text-gray-400 whitespace-nowrap">Due: {formatDate(todo.dueDate)}</span>
         <select value={todo.status} onChange={(e) => onStatusChange(todo._id, e.target.value)} className="p-1 text-xs bg-gray-700 border border-gray-600 rounded cursor-pointer focus:outline-none">
